@@ -15,19 +15,20 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
+const Users = require('./models/user');
+const Sessions = require('./models/session');
 
-
-app.get('/', 
+app.get('/',
 (req, res) => {
   res.render('index');
 });
 
-app.get('/create', 
+app.get('/create',
 (req, res) => {
   res.render('index');
 });
 
-app.get('/links', 
+app.get('/links',
 (req, res, next) => {
   models.Links.getAll()
     .then(links => {
@@ -38,7 +39,7 @@ app.get('/links',
     });
 });
 
-app.post('/links', 
+app.post('/links',
 (req, res, next) => {
   var url = req.body.url;
   if (!models.Links.isValidUrl(url)) {
@@ -77,7 +78,28 @@ app.post('/links',
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
+app.post('/signup',
+(req, res, next) => {
+  var username = req.body.username;
+  var pw = req.body.password;
 
+  models.Users.create({ username })
+    .then((err, data)  => {
+      if (err) {
+        throw(err);
+        res.redirect('/login');
+      } else {
+      user.compare(pw, user.password, pwmatch => {
+          if (pwmatch) {
+            models.Sessions.create(req, res, user);
+          } else {
+            res.redirect('/login');
+          }
+        }); // end compare
+      } //end else
+    }) //end then
+    res.end();
+}); //end app.post signup
 
 
 /************************************************************/
