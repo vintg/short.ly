@@ -17,6 +17,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 const Users = require('./models/user');
 const Sessions = require('./models/session');
+const cookieParser = require('./middleware/cookieParser');
 
 app.get('/',
 (req, res) => {
@@ -78,28 +79,40 @@ app.post('/links',
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
-app.post('/signup',
+
+app.get('/signup', cookieParser,
+  (req, res, next) => {
+    res.render('signup');
+  });
+
+app.post('/signup', //cookieParser, Auth.createSession,
+(req, res, next) => {
+
+  models.Users.create(req.body)
+    .then(data => models.Users.get({username: req.body.username}))
+    .then(user => res.redirect('/'))
+    .catch(err => res.redirect('/signup'))
+}); //end app.post signup
+
+app.post('/login',
 (req, res, next) => {
   var username = req.body.username;
   var pw = req.body.password;
 
-  models.Users.create({ username })
-    .then((err, data)  => {
-      if (err) {
-        throw(err);
-        res.redirect('/login');
-      } else {
-      user.compare(pw, user.password, pwmatch => {
-          if (pwmatch) {
-            models.Sessions.create(req, res, user);
-          } else {
-            res.redirect('/login');
-          }
-        }); // end compare
-      } //end else
-    }) //end then
-    res.end();
-}); //end app.post signup
+  models.Users.get({username: username})
+  .then(user => models.Users.compare(pw, user.password, user.salt))
+  .then(match => {
+      console.log(match);
+     if(match) {
+        res.redirect('/');
+      }
+     else {
+      res.redirect('/login');
+     }
+  })
+  .catch(err => res.redirect('/login'))
+
+}); //end app post login
 
 
 /************************************************************/

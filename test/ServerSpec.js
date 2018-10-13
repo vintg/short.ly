@@ -160,7 +160,7 @@ describe('', function() {
         if (error) { return done(error); }
         var queryString = 'SELECT password FROM users where username = "Samantha"';
         db.query(queryString, function(err, rows) {
-          if (err) { return done (err); }
+          if (err) { console.log ('err');return done (err); }
           var user = rows[0];
           expect(user.password).to.exist;
           expect(user.password).to.not.equal('Samantha');
@@ -202,7 +202,6 @@ describe('', function() {
 
       request(options, function(error, res, body) {
         if (error) { return done(error); }
-        console.log('test = redirects to index after user is created');
         expect(res.headers.location).to.equal('/');
         done();
       });
@@ -238,7 +237,7 @@ describe('', function() {
 
       request(options, function(error, res, body) {
         if (error) { return done(error); }
-        console.log('test = logs in existing users');
+
         expect(res.headers.location).to.equal('/');
         done();
       });
@@ -256,7 +255,7 @@ describe('', function() {
 
       request(options, function(error, res, body) {
         if (error) { return done(error); }
-        console.log('users not existing stay on login pg');
+
         expect(res.headers.location).to.equal('/login');
         done();
       });
@@ -274,7 +273,7 @@ describe('', function() {
 
       request(options, function(error, res, body) {
         if (error) { return done(error); }
-        console.log('test = incorrect pw remains on login pg');
+
         expect(res.headers.location).to.equal('/login');
         done();
       });
